@@ -565,81 +565,115 @@ stack.Pop();	// 删除并返回首个元素 (1)
 
 
 
-## 函数指针
+## 委托与事件
+
+- 委托可以定义在命名空间中，优先级和 class 相同
+
+<img src="C# 基础.assets/image-20230104163353121.png" alt="image-20230104163353121" style="zoom:40%;" />
+
+#### Delegate
+
+- 函数输入及返回类型的模板
+- 储存函数的容器
+
+
 
 - 已知运算函数
 
 ```c#
 static float Add(float a, float b){
-    Console.WriteLine($"{a} + {b} = {a + b}");
     return a + b;
 }
 
 static float Sub(float a, float b){
-    Console.WriteLine($"{a} - {b} = {a - b}");
     return a - b;
 }
-
-static float Mul(float a, float b){
-    Console.WriteLine($"{a} * {b} = {a * b}");
-    return a * b;
-}
 ```
 
 
 
-- delegate 可以保存多个函数指针，使用 `+= -=` 进行操作
+##### Delegate 的赋值
+
+- 直接赋值为函数名
+- 保存多个函数指针，使用 `+= -=` 进行操作
 
 ```c#
-delegate float CalculateFunc(float val1, float cal2);
+public delegate float DelegateCal(float val1, float cal2);
 
-CalculateFunc listenerFunc = Add;
-listenerFunc(3, 5.6f);	// 3 + 5.6 = 8.6
+DelegateCal listenerFunc = Add;
 
-listenerFunc += sub;
-listenerFunc(3, 5.6f);	// 3 + 5.6 = 8.6
-						// 3 - 5.6 = -2.6
-
-listenerFunc -= sub;
-listenerFunc(3, 5.6f);	// 3 + 5.6 = 8.6
-
-listenerFunc += Mul;
-listenerFunc(3, 5.6f);	// 3 + 5.6 = 8.6
-						// 3 * 5.6 = 16.8
-
+listenerFunc -= Add;
+listenerFunc += Add;
+listenerFunc += Sub;
 ```
 
 
 
-##### Action
-
-- 无返回值的 delegate
+##### Delegate 的调用
 
 ```c#
-staitc void Print(string info) => Console.WriteLine(info);
+// 两种调用方式
+listenerFunc(3, 5.6f);
+listenerFunc.invoke(3, 5.6f);	// 3 + 5.6 = 8.6
+								// 3 - 5.6 = -2.6
 
-public delegate void Action<in T>(T obj);
-Action<string> print = Print;
-print("Hello world!");
+// 先检测委托是否为空
+listenerFunc?.invoke(3, 5.6f);
 ```
 
 
 
-##### Func
+#### Event
 
-- 有返回值的 delegate
+- event 类似属性，是对 delegate 的限制，使之不能直接赋值
+- 保存多个函数指针，使用 `+= -=` 进行操作
+- event 也可以用来限制 Action 和 Func
+- https://cloud.tencent.com/developer/ask/sof/1120338
+
+
+
+##### Event 的赋值
 
 ```c#
-public delegate TResult Func<in T1, in T2, out TResult>(T1 arg1, T2 arg2);
+public delegate float DelegateCal(float val1, float cal2);
 
-Func<float, float, float> func = Mul;
-print(func(3, 4).ToString());	// 3 * 4 = 12
-								// 12
+public event DelegateCal listenerFunc2;
+
+listenerFunc2 += Add;
+```
+
+
+
+#### Action
+
+- delegate 的简写
+- 无返回值
+
+```c#
+public Action<int> listenerAct;
+
+listenerAct += Add;
+```
+
+
+
+#### Func
+
+- 有返回值的 Action
+- <> 中的最后一个类型就是返回值
+- 多个函数有返回值，最后一个被注册的函数
+
+```c#
+public Func<float, float, float> func = Add;
+func += Sub
+func(3, 4);	// 3 - 4 = -1
 ```
 
 
 
 ##### 匿名函数
+
+- Lamda 表达式
 
 ```c#
 int i = 10;
@@ -649,6 +683,54 @@ Action closure = () => {
 
 closure();		// i = 20;
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
