@@ -180,6 +180,47 @@ public:
 
 
 
+#### 两个栈实现队列 Jz.09 ⭐⭐
+
+**问题**：用两个栈，实现头部出队和尾部入队
+
+**思路**：
+
+- 一个插入栈，一个输出栈
+- 输出栈为空时，转移输入栈中元素到输出站
+
+```c++
+class CQueue {
+public:
+    stack<int> in_stack, out_stack;
+	
+    
+    void appendTail(int value) {
+        in_stack.push(value);
+    }
+    
+    int deleteHead() {
+        if(out_stack.empty()){
+            if(in_stack.empty())
+                return -1;
+
+            while(!in_stack.empty()){
+                out_stack.push(in_stack.top());
+                in_stack.pop();
+            }
+        }
+
+        int out = out_stack.top();
+        out_stack.pop();
+        return out;
+    }
+};
+```
+
+
+
+
+
 ## 链表
 
 ```c++
@@ -704,16 +745,14 @@ public:
 
 
 
-
-
 #### 二叉树的镜像 Jz.27
 
 **问题**：操作给定的二叉树，将其变换为源二叉树的镜像。
 
 **思路：**
 
-- 交换每一个节点的左子树和右子树
 - 递归
+- 子问题拆解：交换每一个节点的左子树和右子树
 
 ```c++
 class Solution {
@@ -735,7 +774,108 @@ public:
 
 
 
-#### 前中后序遍历
+#### 二叉树中和为某一值的路径(一)   Jz.82⭐
+
+**问题**：给定一个二叉树root和一个值 sum ，判断是否有从根节点到叶子节点的节点值之和等于 sum 的路径
+
+**思路**： 递归遍历二叉树
+
+- 方法1：对左右子节点，加上父亲节点的值，最后叶节点即为整条路径的和
+- 方法2：每次调用减去父节点的值，减到叶节点时是否恰好为 0
+- 递归判断**当前节点是否为 NULL**
+
+
+
+dzz3v7z3
+
+#### 二叉树中和为某一值的路径(二)   Jz.34⭐⭐
+
+**问题**：给定一个二叉树root和一个值 sum ，判断是否有从根节点到叶子节点的节点值之和等于 sum 的路径，输出所有路径
+
+**思路**： 递归遍历二叉树
+
+- 每次调用减去父节点的值，减到叶节点时是否恰好为 0
+- 递归判断**当前节点是否为叶节点**，即**无左右子节点**，是的话判断是否可以输出路径
+
+```c++
+class Solution {
+public:
+	vector<vector<int>> res;
+
+	void recursion(TreeNode* root, int expectNumber, vector<int> path) {
+		path.push_back(root -> val);
+		expectNumber -= root -> val;
+
+        if(!root -> left && !root -> right){
+			if(!path.empty() && expectNumber == 0){
+				res.push_back(path);
+			}
+			return;
+		}
+
+		if(root -> left)
+			recursion(root -> left, expectNumber, path);
+		if(root -> right)
+			recursion(root -> right, expectNumber, path);
+    }
+
+    vector<vector<int>> FindPath(TreeNode* root,int expectNumber) {
+		if(!root)
+			return res;
+        recursion(root, expectNumber, vector<int>());
+		return res;
+    }
+}; 
+```
+
+
+
+
+
+#### 树的子结构  Jz.26 ⭐⭐
+
+**问题**：输入两棵二叉树A，B，判断 B 是不是 A 的子结构。（空树不是任意一个树的子结构） 
+
+![image-20230103031925290](Typora Pictures/Leetcode+.assets/image-20230103031925290.png)
+
+**思路**：
+
+- 新建一个函数 `IsSubtree`，判断以 pRoot1 与 pRoot2 为根的两个树是否嵌套（层次遍历？）
+- 原函数 `HasSubtree` 遍历 A 树中每一个结点，判断  `IsSubtree` 
+
+```c++
+class Solution {
+public:
+	bool IsSubtree(TreeNode* pRoot1, TreeNode* pRoot2 ) {
+		if(!pRoot1 && pRoot2)
+			return false;
+    	if(!pRoot2){
+        	return true;
+    	}
+    	else if(pRoot2 -> val != pRoot1 -> val){
+        	return false;
+    	}
+    	else{
+        	return IsSubtree(pRoot1 -> left, pRoot2 -> left) && IsSubtree(pRoot1 -> right, pRoot2 -> right);
+    	}
+	}
+
+	bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2) {
+		if(!pRoot1 || !pRoot2)
+			return false;
+
+		if(IsSubtree(pRoot1, pRoot2))
+			return true;
+
+		return HasSubtree(pRoot1 -> left, pRoot2) || HasSubtree(pRoot1 -> right, pRoot2);
+
+	}
+};
+```
+
+
+
+### 前中后序遍历
 
 前序遍历、中序遍历和后序遍历是三种利用深度优先搜索遍历二叉树的方式
 
@@ -819,11 +959,45 @@ public:
 
 
 
+#### 重建二叉树  Jz.07
+
+⭐⭐
+
+**问题：**给定节点数为 n 的二叉树的前序遍历和中序遍历，重建出该二叉树，并返回它的头结点。
+
+**思路：**
+
+- 递归
+- 子问题拆解：每次找到根节点的左子树和右子树
+
+```c++
+class Solution {
+public:
+    TreeNode* reConstructBinaryTree(vector<int> pre,vector<int> vin) {
+        if(pre.size() == 0 || vin.size() == 0){
+            return NULL;
+        }
+        TreeNode* root = new TreeNode(pre[0]);
+
+        for(int i = 0; i < vin.size(); ++i){
+            if(vin[i] == pre[0]){
+                vector<int> leftPre(pre.begin() + 1, pre.begin() + i + 1);
+                vector<int> leftVin(vin.begin(), vin.begin() + i);
+                root -> left = reConstructBinaryTree(leftPre, leftVin);
+
+                vector<int> rightPre(pre.begin() + i + 1, pre.end());
+                vector<int> rightVin(vin.begin() + i + 1, vin.end());
+                root -> right = reConstructBinaryTree(rightPre, rightVin);
+            }
+        }
+        return root;
+    }
+};
+```
 
 
 
-
-#### 层次遍历
+### 层次遍历
 
 - 我们可以使用广度优先搜索进行层次遍历。
 - 用一个队列储存未被打印的节点
@@ -1052,13 +1226,23 @@ void merge(int lo, int mi, int hi){
 
 
 
-![image-20221012004457088](Typora Pictures/Leetcode+.assets/image-20221012004457088.png)
+<img src="Typora Pictures/Leetcode+.assets/image-20221012004457088.png" alt="image-20221012004457088" style="zoom: 50%;" />
 
 | 查找算法 | 时间复杂度 | 数据结构 |
 | -------- | ---------- | -------- |
 | 二分查找 | $O(logn)$  |          |
 |          |            |          |
 |          |            |          |
+
+
+
+| 排序算法 | 时间复杂度    | 最好情况      | 最坏情况      | 数据结构   |
+| -------- | ------------- | ------------- | ------------- | ---------- |
+| 归并排序 | $O(nlogn)$    |               |               | 向量、列表 |
+|          |               |               |               |            |
+| 插入排序 | $O(n^2)$      | $O(n)$        | $O(n^2)$      | 列表       |
+| 选择排序 | $\Theta(n^2)$ | $\Theta(n^2)$ | $\Theta(n^2)$ | 列表       |
+| 冒泡排序 | $O(n^2)$      |               |               |            |
 
 
 
@@ -1904,19 +2088,88 @@ public:
 
 ## DFS
 
-https://leetcode-cn.com/problems/number-of-islands/solution/dao-yu-lei-wen-ti-de-tong-yong-jie-fa-dfs-bian-li-/
-
-树的前中后序遍历
+二叉树的前中后序遍历是最简单的 DFS，其他形式无非是多几个方向
 
 
 
-#### 岛屿数量 No.200
+#### 岛屿数量 No.200 ⭐⭐
 
+**问题**：有一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，计算网格中岛屿的数量
 
+**思路**：扫描整个二维网格。如果一个位置为 `'1'`，则以其为起始节点开始进行深度优先搜索
 
 ```c++
+class Solution {
+public:
+    //DFS
+    void DFS(vector<vector<char>>& grid, int x, int y){
+        if(x < 0 || y < 0 || x >= grid.size() || y >= grid[0].size())
+            return;
+        
+        if(grid[x][y] == '0' || grid[x][y] == '2')
+            return;
 
+        grid[x][y] = '2';
+        DFS(grid, x + 1, y);
+        DFS(grid, x - 1, y);
+        DFS(grid, x, y + 1);
+        DFS(grid, x, y - 1);
+    } 
+
+    int numIslands(vector<vector<char>>& grid) {
+        int count = 0;
+        for(int i = 0; i < grid.size(); ++i){
+            for(int j = 0; j < grid[0].size(); ++j){
+                if(grid[i][j] == '1'){
+                    ++count;
+                    SunkIslands(grid, i, j);
+                }
+            }
+        }
+        return count;
+    }
+};
 ```
+
+
+
+#### 岛屿的最大面积 No.695 ⭐⭐
+
+**问题**：有一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，返回面积最大的岛屿的面积
+
+**思路**：扫描整个二维网格。如果一个位置为 `'1'`，则以其为起始节点开始进行深度优先搜索，记录面积
+
+```c++
+class Solution {
+public:
+    void dfs(vector<vector<int>>& grid, int x, int y, int& size) {
+        if(x < 0 || y < 0 || x == grid.size() || y == grid[0].size() || grid[x][y] == 0 || grid[x][y] == 2)
+            return;
+
+        grid[x][y] = 2;
+        ++size;
+
+        dfs(grid, x - 1, y, size);
+        dfs(grid, x + 1, y, size);
+        dfs(grid, x, y + 1, size);
+        dfs(grid, x, y - 1, size);
+    }
+
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        int maxSize = 0;
+        for(int i = 0; i < grid.size(); ++i){
+            for(int j = 0; j < grid[0].size(); ++j){
+                int size = 0;
+                dfs(grid, i, j, size);
+                maxSize = max(maxSize, size);
+            }
+        }
+        return maxSize;
+    }
+};
+```
+
+
 
 
 
@@ -1961,7 +2214,7 @@ public:
 
 ### 掰扯不清楚
 
-#### ⭐下一个排列 No.31
+#### 下一个排列 No.31⭐
 
 **问题**：求出数组 `nums` 字典序大一点的下一个排列
 
@@ -2022,7 +2275,9 @@ public:
 
 
 
-#### 记录字母出现次数：哈希表
+## 哈希表
+
+#### 记录字母出现次数 ⭐
 
 - 例中字母全为小写
 
