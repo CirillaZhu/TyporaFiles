@@ -480,6 +480,52 @@ public:
 
 
 
+#### 复杂链表的复制 Jz.35
+
+**问题**：输入一个复杂链表（每个节点中有节点值，以及两个指针，一个指向下一个节点，另一个特殊指针random指向一个随机节点），请对此链表进行深拷贝，并返回拷贝后的头节点
+
+**思路** :alien:  ：<img src="Typora Pictures/Leetcode+.assets/7A8DF85097EA0F2B7D31589D6217FE0D.gif" alt="7A8DF85097EA0F2B7D31589D6217FE0D" style="zoom: 67%;" />
+
+- :star:检查空指针！！
+- 断开所有原来节点和新节点的连接！
+
+```c++
+class Solution {
+public:
+    RandomListNode* Clone(RandomListNode* pHead) {
+        if(!pHead) return pHead;
+        
+        RandomListNode *temp， *cur = pHead;
+        while(cur){
+            temp = new RandomListNode(cur -> label);
+            temp -> next = cur -> next;
+            cur -> next = temp;
+            cur = temp -> next;
+        }
+
+        cur = pHead;
+        while(cur){
+            cur -> next -> random = cur -> random == nullptr? nullptr : cur -> random -> next;
+            cur = cur -> next -> next;
+        }
+        
+        cur = pHead;
+        while(cur){
+            temp = cur -> next;
+            cur = temp -> next;
+            temp -> next = cur == nullptr ? nullptr : cur -> next;
+        }
+        
+        RandomListNode *res = pHead -> next;
+        pHead -> next = nullptr;
+
+        return res;
+    }
+};
+```
+
+
+
 
 
 ### 双指针
@@ -785,8 +831,6 @@ public:
 - 递归判断**当前节点是否为 NULL**
 
 
-
-dzz3v7z3
 
 #### 二叉树中和为某一值的路径(二)   Jz.34⭐⭐
 
@@ -2277,6 +2321,11 @@ public:
 
 ## 哈希表
 
+- 查询时间复杂度 O(1)
+- 其实一般就是 unordered_map 啦
+
+
+
 #### 记录字母出现次数 ⭐
 
 - 例中字母全为小写
@@ -2287,6 +2336,41 @@ vector<int> table(26, 0);
 
 for(char c : s)
     ++table['z' - c];
+```
+
+
+
+#### 复杂链表的复制 Jz.35
+
+**思路**:seedling: ：
+
+```c++
+class Solution {
+public:
+    RandomListNode* Clone(RandomListNode* pHead) {
+        if(!pHead) return pHead;    // 为空则直接返回空
+        unordered_map<RandomListNode*, RandomListNode*> mp;    // 创建哈希表
+ 
+        RandomListNode* dummy = new RandomListNode(0);    // 哨兵节点
+ 
+        RandomListNode *pre = dummy, *cur = pHead;    // 指向哨兵和链表头的指针
+ 
+        while(cur){
+            RandomListNode* clone = new RandomListNode(cur->label);    // 拷贝节点
+            pre->next = clone;    // 与上个结点连接
+            mp[cur] = clone;    // 记录映射关系
+            pre = pre->next;    // 指针移动
+            cur = cur->next;
+        }
+ 
+        for(auto& [key, value] : mp){    // 遍历哈希表
+            value->random = key->random == NULL ? NULL : mp[key->random];
+        }
+ 
+        delete dummy;    // 释放哨兵节点空间
+        return mp[pHead];
+    }
+};
 ```
 
 
@@ -2402,6 +2486,45 @@ int superPow(int a, vector<int>& b) {
     }
     return ans;
 }
+```
+
+
+
+
+
+## 数学
+
+#### 数字序列中的某一位数字 Jz.44
+
+**问题**：数字以 0123456789101112131415... 的格式作为一个字符序列，在这个序列中第 2 位（**从下标 0 开始计算**）是 2 ，第 10 位是 1 ，第 13 位是 1 ，以此类推，请输出第 n 位对应的数字
+
+**思路**：
+
+- 先找到第 n 位所在的数，通过减去每次十进制之前的所有数来靠近范围，然后用除去位数来确定
+- 变成 string，用 `(n - 1) % digitCount` 找位数
+
+```c++
+class Solution {
+public:
+    int findNthDigit(int n) {
+        long bottom = 0, top = 9;
+        int digitCount = 1;
+        int num = 0;
+		
+        // 找到第 n 位所在的数
+        while(n > (top - bottom) * digitCount){
+            n -= (top - bottom) * digitCount;
+            bottom = top;
+            top = top * 10 + 9;
+            digitCount += 1;
+        }
+        num = bottom + n/digitCount + (n%digitCount == 0? 0: 1);
+        
+        int index = (n - 1) % digitCount;
+        string s = to_string(num);
+        return s[index] - '0';
+    }
+};
 ```
 
 
