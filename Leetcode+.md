@@ -921,7 +921,7 @@ public:
 
 ### 前中后序遍历
 
-前序遍历、中序遍历和后序遍历是三种利用深度优先搜索遍历二叉树的方式
+前序遍历、中序遍历和后序遍历是三种利用**深度优先搜索**遍历二叉树的方式
 
 ![image-20221018161012961](Typora Pictures/Leetcode+.assets/image-20221018161012961.png)
 
@@ -1149,11 +1149,98 @@ public:
 
 
 
+#### 把二叉树打印成多行 Jz.78
+
+**问题**：给定一个节点数为 n 二叉树，返回一个二维数组。要求从上到下按层打印二叉树的值，同一层结点从左至右输出，每一层输出一行
+
+**思路**：
+
+- 定义两个栈，分别存储节点与层数
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> Print(TreeNode* pRoot) {
+        vector<vector<int>> res;
+        if(pRoot == nullptr){
+            return res;
+        }
+
+        queue<TreeNode*> nodes;
+        queue<int> level;
+
+        nodes.push(pRoot);
+        level.push(0);
+        res.push_back({});
+        int curLevel = 0;
+        
+        while(!nodes.empty()){
+            if(curLevel == level.front())		// 层数不变直接加入结果
+                res[curLevel].push_back(nodes.front() -> val);
+            else{								// 层数增加，在结果中新建一个 vector
+                res.push_back({nodes.front() -> val});
+                curLevel++;
+            }
+
+            if(nodes.front()->left){
+                nodes.push(nodes.front()->left);
+                level.push(curLevel + 1);   
+            }
+            if(nodes.front()->right){
+                nodes.push(nodes.front()->right);
+                level.push(curLevel + 1);
+            }
+
+            nodes.pop();
+            level.pop(); 
+        }
+        
+        return res;
+    }
+    
+};
+```
+
+
+
 ### 二叉搜索树
 
 ![3AB6193EBA28439D5A1860D206E3F7AC](Typora Pictures/Leetcode+.assets/3AB6193EBA28439D5A1860D206E3F7AC.gif)
 
-#### 二叉搜索树的后序遍历 Jz.33
+
+
+#### 二叉搜索树的最近公共祖先 Jz.28 
+
+#### ⭐
+
+**题目**: 给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+
+**思路**：对每个节点来说，比它大的数全在它右字数，比它小的数全在它左子树
+
+```c++
+class Solution {
+public:
+    int lowestCommonAncestor(TreeNode* root, int p, int q) {
+        if(root -> val > p && root -> val > q){
+            return lowestCommonAncestor(root -> left, p, q);
+        }
+        else if(root -> val < p && root -> val < q){
+            return lowestCommonAncestor(root -> right, p, q);
+        }
+        else{
+            return root -> val;
+        }
+    }
+};
+```
+
+
+
+
+
+#### 二叉搜索树的后序遍历 Jz.33 
+
+#### ⭐⭐
 
 **题目: **输入一个数组，判断它是不是某二叉搜索树的后序遍历结果
 
@@ -2032,6 +2119,25 @@ public:
 - 如果某一个作为 **起跳点** 的格子可以跳跃的距离是 3，那么表示后面 3 个格子都可以作为 **起跳点**
 - 对每一个能作为 **起跳点** 的格子都尝试跳一次，把 **能跳到最远的距离** 不断更新
 - 如果可以一直跳到最后，就成功了
+
+
+
+#### [跳跃游戏 II No.45](https://leetcode.cn/problems/jump-game-ii/) ⭐⭐
+
+**问题**
+
+- 给定一个非负整数数组 nums ，你最初位于数组的 第一个下标 。
+
+- 数组中的每个元素代表你在该位置可以跳跃的最大长度
+
+- 返回到达最后一个下标的最小跳越次数
+
+
+
+**思路**
+
+- 贪心算法，只考虑目前这一步跳到哪里，才能让下一步跳的最远
+- 排除特例为 `nums.size() <= 1`，而非 `<= 0`
 
 
 
