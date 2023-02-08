@@ -180,6 +180,47 @@ public:
 
 
 
+#### 两个栈实现队列 Jz.09 ⭐⭐
+
+**问题**：用两个栈，实现头部出队和尾部入队
+
+**思路**：
+
+- 一个插入栈，一个输出栈
+- 输出栈为空时，转移输入栈中元素到输出站
+
+```c++
+class CQueue {
+public:
+    stack<int> in_stack, out_stack;
+	
+    
+    void appendTail(int value) {
+        in_stack.push(value);
+    }
+    
+    int deleteHead() {
+        if(out_stack.empty()){
+            if(in_stack.empty())
+                return -1;
+
+            while(!in_stack.empty()){
+                out_stack.push(in_stack.top());
+                in_stack.pop();
+            }
+        }
+
+        int out = out_stack.top();
+        out_stack.pop();
+        return out;
+    }
+};
+```
+
+
+
+
+
 ## 链表
 
 ```c++
@@ -433,6 +474,52 @@ public:
                 pre = pre -> next;
         }
         return preHead -> next;
+    }
+};
+```
+
+
+
+#### 复杂链表的复制 Jz.35
+
+**问题**：输入一个复杂链表（每个节点中有节点值，以及两个指针，一个指向下一个节点，另一个特殊指针random指向一个随机节点），请对此链表进行深拷贝，并返回拷贝后的头节点
+
+**思路** :alien:  ：<img src="Typora Pictures/Leetcode+.assets/7A8DF85097EA0F2B7D31589D6217FE0D.gif" alt="7A8DF85097EA0F2B7D31589D6217FE0D" style="zoom: 67%;" />
+
+- :star:检查空指针！！
+- 断开所有原来节点和新节点的连接！
+
+```c++
+class Solution {
+public:
+    RandomListNode* Clone(RandomListNode* pHead) {
+        if(!pHead) return pHead;
+        
+        RandomListNode *temp， *cur = pHead;
+        while(cur){
+            temp = new RandomListNode(cur -> label);
+            temp -> next = cur -> next;
+            cur -> next = temp;
+            cur = temp -> next;
+        }
+
+        cur = pHead;
+        while(cur){
+            cur -> next -> random = cur -> random == nullptr? nullptr : cur -> random -> next;
+            cur = cur -> next -> next;
+        }
+        
+        cur = pHead;
+        while(cur){
+            temp = cur -> next;
+            cur = temp -> next;
+            temp -> next = cur == nullptr ? nullptr : cur -> next;
+        }
+        
+        RandomListNode *res = pHead -> next;
+        pHead -> next = nullptr;
+
+        return res;
     }
 };
 ```
@@ -704,16 +791,14 @@ public:
 
 
 
-
-
 #### 二叉树的镜像 Jz.27
 
 **问题**：操作给定的二叉树，将其变换为源二叉树的镜像。
 
 **思路：**
 
-- 交换每一个节点的左子树和右子树
 - 递归
+- 子问题拆解：交换每一个节点的左子树和右子树
 
 ```c++
 class Solution {
@@ -735,9 +820,108 @@ public:
 
 
 
-#### 前中后序遍历
+#### 二叉树中和为某一值的路径(一)   Jz.82⭐
 
-前序遍历、中序遍历和后序遍历是三种利用深度优先搜索遍历二叉树的方式
+**问题**：给定一个二叉树root和一个值 sum ，判断是否有从根节点到叶子节点的节点值之和等于 sum 的路径
+
+**思路**： 递归遍历二叉树
+
+- 方法1：对左右子节点，加上父亲节点的值，最后叶节点即为整条路径的和
+- 方法2：每次调用减去父节点的值，减到叶节点时是否恰好为 0
+- 递归判断**当前节点是否为 NULL**
+
+
+
+#### 二叉树中和为某一值的路径(二)   Jz.34⭐⭐
+
+**问题**：给定一个二叉树root和一个值 sum ，判断是否有从根节点到叶子节点的节点值之和等于 sum 的路径，输出所有路径
+
+**思路**： 递归遍历二叉树
+
+- 每次调用减去父节点的值，减到叶节点时是否恰好为 0
+- 递归判断**当前节点是否为叶节点**，即**无左右子节点**，是的话判断是否可以输出路径
+
+```c++
+class Solution {
+public:
+	vector<vector<int>> res;
+
+	void recursion(TreeNode* root, int expectNumber, vector<int> path) {
+		path.push_back(root -> val);
+		expectNumber -= root -> val;
+
+        if(!root -> left && !root -> right){
+			if(!path.empty() && expectNumber == 0){
+				res.push_back(path);
+			}
+			return;
+		}
+
+		if(root -> left)
+			recursion(root -> left, expectNumber, path);
+		if(root -> right)
+			recursion(root -> right, expectNumber, path);
+    }
+
+    vector<vector<int>> FindPath(TreeNode* root,int expectNumber) {
+		if(!root)
+			return res;
+        recursion(root, expectNumber, vector<int>());
+		return res;
+    }
+}; 
+```
+
+
+
+
+
+#### 树的子结构  Jz.26 ⭐⭐
+
+**问题**：输入两棵二叉树A，B，判断 B 是不是 A 的子结构。（空树不是任意一个树的子结构） 
+
+![image-20230103031925290](Typora Pictures/Leetcode+.assets/image-20230103031925290.png)
+
+**思路**：
+
+- 新建一个函数 `IsSubtree`，判断以 pRoot1 与 pRoot2 为根的两个树是否嵌套（层次遍历？）
+- 原函数 `HasSubtree` 遍历 A 树中每一个结点，判断  `IsSubtree` 
+
+```c++
+class Solution {
+public:
+	bool IsSubtree(TreeNode* pRoot1, TreeNode* pRoot2 ) {
+		if(!pRoot1 && pRoot2)
+			return false;
+    	if(!pRoot2){
+        	return true;
+    	}
+    	else if(pRoot2 -> val != pRoot1 -> val){
+        	return false;
+    	}
+    	else{
+        	return IsSubtree(pRoot1 -> left, pRoot2 -> left) && IsSubtree(pRoot1 -> right, pRoot2 -> right);
+    	}
+	}
+
+	bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2) {
+		if(!pRoot1 || !pRoot2)
+			return false;
+
+		if(IsSubtree(pRoot1, pRoot2))
+			return true;
+
+		return HasSubtree(pRoot1 -> left, pRoot2) || HasSubtree(pRoot1 -> right, pRoot2);
+
+	}
+};
+```
+
+
+
+### 前中后序遍历
+
+前序遍历、中序遍历和后序遍历是三种利用**深度优先搜索**遍历二叉树的方式
 
 ![image-20221018161012961](Typora Pictures/Leetcode+.assets/image-20221018161012961.png)
 
@@ -819,11 +1003,45 @@ public:
 
 
 
+#### 重建二叉树  Jz.07
+
+⭐⭐
+
+**问题：**给定节点数为 n 的二叉树的前序遍历和中序遍历，重建出该二叉树，并返回它的头结点。
+
+**思路：**
+
+- 递归
+- 子问题拆解：每次找到根节点的左子树和右子树
+
+```c++
+class Solution {
+public:
+    TreeNode* reConstructBinaryTree(vector<int> pre,vector<int> vin) {
+        if(pre.size() == 0 || vin.size() == 0){
+            return NULL;
+        }
+        TreeNode* root = new TreeNode(pre[0]);
+
+        for(int i = 0; i < vin.size(); ++i){
+            if(vin[i] == pre[0]){
+                vector<int> leftPre(pre.begin() + 1, pre.begin() + i + 1);
+                vector<int> leftVin(vin.begin(), vin.begin() + i);
+                root -> left = reConstructBinaryTree(leftPre, leftVin);
+
+                vector<int> rightPre(pre.begin() + i + 1, pre.end());
+                vector<int> rightVin(vin.begin() + i + 1, vin.end());
+                root -> right = reConstructBinaryTree(rightPre, rightVin);
+            }
+        }
+        return root;
+    }
+};
+```
 
 
 
-
-#### 层次遍历
+### 层次遍历
 
 - 我们可以使用广度优先搜索进行层次遍历。
 - 用一个队列储存未被打印的节点
@@ -931,11 +1149,98 @@ public:
 
 
 
+#### 把二叉树打印成多行 Jz.78
+
+**问题**：给定一个节点数为 n 二叉树，返回一个二维数组。要求从上到下按层打印二叉树的值，同一层结点从左至右输出，每一层输出一行
+
+**思路**：
+
+- 定义两个栈，分别存储节点与层数
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> Print(TreeNode* pRoot) {
+        vector<vector<int>> res;
+        if(pRoot == nullptr){
+            return res;
+        }
+
+        queue<TreeNode*> nodes;
+        queue<int> level;
+
+        nodes.push(pRoot);
+        level.push(0);
+        res.push_back({});
+        int curLevel = 0;
+        
+        while(!nodes.empty()){
+            if(curLevel == level.front())		// 层数不变直接加入结果
+                res[curLevel].push_back(nodes.front() -> val);
+            else{								// 层数增加，在结果中新建一个 vector
+                res.push_back({nodes.front() -> val});
+                curLevel++;
+            }
+
+            if(nodes.front()->left){
+                nodes.push(nodes.front()->left);
+                level.push(curLevel + 1);   
+            }
+            if(nodes.front()->right){
+                nodes.push(nodes.front()->right);
+                level.push(curLevel + 1);
+            }
+
+            nodes.pop();
+            level.pop(); 
+        }
+        
+        return res;
+    }
+    
+};
+```
+
+
+
 ### 二叉搜索树
 
 ![3AB6193EBA28439D5A1860D206E3F7AC](Typora Pictures/Leetcode+.assets/3AB6193EBA28439D5A1860D206E3F7AC.gif)
 
-#### 二叉搜索树的后序遍历 Jz.33
+
+
+#### 二叉搜索树的最近公共祖先 Jz.28 
+
+#### ⭐
+
+**题目**: 给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+
+**思路**：对每个节点来说，比它大的数全在它右字数，比它小的数全在它左子树
+
+```c++
+class Solution {
+public:
+    int lowestCommonAncestor(TreeNode* root, int p, int q) {
+        if(root -> val > p && root -> val > q){
+            return lowestCommonAncestor(root -> left, p, q);
+        }
+        else if(root -> val < p && root -> val < q){
+            return lowestCommonAncestor(root -> right, p, q);
+        }
+        else{
+            return root -> val;
+        }
+    }
+};
+```
+
+
+
+
+
+#### 二叉搜索树的后序遍历 Jz.33 
+
+#### ⭐⭐
 
 **题目: **输入一个数组，判断它是不是某二叉搜索树的后序遍历结果
 
@@ -1052,13 +1357,23 @@ void merge(int lo, int mi, int hi){
 
 
 
-![image-20221012004457088](Typora Pictures/Leetcode+.assets/image-20221012004457088.png)
+<img src="Typora Pictures/Leetcode+.assets/image-20221012004457088.png" alt="image-20221012004457088" style="zoom: 50%;" />
 
 | 查找算法 | 时间复杂度 | 数据结构 |
 | -------- | ---------- | -------- |
 | 二分查找 | $O(logn)$  |          |
 |          |            |          |
 |          |            |          |
+
+
+
+| 排序算法 | 时间复杂度    | 最好情况      | 最坏情况      | 数据结构   |
+| -------- | ------------- | ------------- | ------------- | ---------- |
+| 归并排序 | $O(nlogn)$    |               |               | 向量、列表 |
+|          |               |               |               |            |
+| 插入排序 | $O(n^2)$      | $O(n)$        | $O(n^2)$      | 列表       |
+| 选择排序 | $\Theta(n^2)$ | $\Theta(n^2)$ | $\Theta(n^2)$ | 列表       |
+| 冒泡排序 | $O(n^2)$      |               |               |            |
 
 
 
@@ -1807,6 +2122,25 @@ public:
 
 
 
+#### [跳跃游戏 II No.45](https://leetcode.cn/problems/jump-game-ii/) ⭐⭐
+
+**问题**
+
+- 给定一个非负整数数组 nums ，你最初位于数组的 第一个下标 。
+
+- 数组中的每个元素代表你在该位置可以跳跃的最大长度
+
+- 返回到达最后一个下标的最小跳越次数
+
+
+
+**思路**
+
+- 贪心算法，只考虑目前这一步跳到哪里，才能让下一步跳的最远
+- 排除特例为 `nums.size() <= 1`，而非 `<= 0`
+
+
+
 ## 回溯
 
 排列组合，**画树形图** ！！！
@@ -1904,19 +2238,88 @@ public:
 
 ## DFS
 
-https://leetcode-cn.com/problems/number-of-islands/solution/dao-yu-lei-wen-ti-de-tong-yong-jie-fa-dfs-bian-li-/
-
-树的前中后序遍历
+二叉树的前中后序遍历是最简单的 DFS，其他形式无非是多几个方向
 
 
 
-#### 岛屿数量 No.200
+#### 岛屿数量 No.200 ⭐⭐
 
+**问题**：有一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，计算网格中岛屿的数量
 
+**思路**：扫描整个二维网格。如果一个位置为 `'1'`，则以其为起始节点开始进行深度优先搜索
 
 ```c++
+class Solution {
+public:
+    //DFS
+    void DFS(vector<vector<char>>& grid, int x, int y){
+        if(x < 0 || y < 0 || x >= grid.size() || y >= grid[0].size())
+            return;
+        
+        if(grid[x][y] == '0' || grid[x][y] == '2')
+            return;
 
+        grid[x][y] = '2';
+        DFS(grid, x + 1, y);
+        DFS(grid, x - 1, y);
+        DFS(grid, x, y + 1);
+        DFS(grid, x, y - 1);
+    } 
+
+    int numIslands(vector<vector<char>>& grid) {
+        int count = 0;
+        for(int i = 0; i < grid.size(); ++i){
+            for(int j = 0; j < grid[0].size(); ++j){
+                if(grid[i][j] == '1'){
+                    ++count;
+                    SunkIslands(grid, i, j);
+                }
+            }
+        }
+        return count;
+    }
+};
 ```
+
+
+
+#### 岛屿的最大面积 No.695 ⭐⭐
+
+**问题**：有一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，返回面积最大的岛屿的面积
+
+**思路**：扫描整个二维网格。如果一个位置为 `'1'`，则以其为起始节点开始进行深度优先搜索，记录面积
+
+```c++
+class Solution {
+public:
+    void dfs(vector<vector<int>>& grid, int x, int y, int& size) {
+        if(x < 0 || y < 0 || x == grid.size() || y == grid[0].size() || grid[x][y] == 0 || grid[x][y] == 2)
+            return;
+
+        grid[x][y] = 2;
+        ++size;
+
+        dfs(grid, x - 1, y, size);
+        dfs(grid, x + 1, y, size);
+        dfs(grid, x, y + 1, size);
+        dfs(grid, x, y - 1, size);
+    }
+
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        int maxSize = 0;
+        for(int i = 0; i < grid.size(); ++i){
+            for(int j = 0; j < grid[0].size(); ++j){
+                int size = 0;
+                dfs(grid, i, j, size);
+                maxSize = max(maxSize, size);
+            }
+        }
+        return maxSize;
+    }
+};
+```
+
+
 
 
 
@@ -1961,7 +2364,7 @@ public:
 
 ### 掰扯不清楚
 
-#### ⭐下一个排列 No.31
+#### 下一个排列 No.31⭐
 
 **问题**：求出数组 `nums` 字典序大一点的下一个排列
 
@@ -2022,7 +2425,14 @@ public:
 
 
 
-#### 记录字母出现次数：哈希表
+## 哈希表
+
+- 查询时间复杂度 O(1)
+- 其实一般就是 unordered_map 啦
+
+
+
+#### 记录字母出现次数 ⭐
 
 - 例中字母全为小写
 
@@ -2032,6 +2442,41 @@ vector<int> table(26, 0);
 
 for(char c : s)
     ++table['z' - c];
+```
+
+
+
+#### 复杂链表的复制 Jz.35
+
+**思路**:seedling: ：
+
+```c++
+class Solution {
+public:
+    RandomListNode* Clone(RandomListNode* pHead) {
+        if(!pHead) return pHead;    // 为空则直接返回空
+        unordered_map<RandomListNode*, RandomListNode*> mp;    // 创建哈希表
+ 
+        RandomListNode* dummy = new RandomListNode(0);    // 哨兵节点
+ 
+        RandomListNode *pre = dummy, *cur = pHead;    // 指向哨兵和链表头的指针
+ 
+        while(cur){
+            RandomListNode* clone = new RandomListNode(cur->label);    // 拷贝节点
+            pre->next = clone;    // 与上个结点连接
+            mp[cur] = clone;    // 记录映射关系
+            pre = pre->next;    // 指针移动
+            cur = cur->next;
+        }
+ 
+        for(auto& [key, value] : mp){    // 遍历哈希表
+            value->random = key->random == NULL ? NULL : mp[key->random];
+        }
+ 
+        delete dummy;    // 释放哨兵节点空间
+        return mp[pHead];
+    }
+};
 ```
 
 
@@ -2147,6 +2592,45 @@ int superPow(int a, vector<int>& b) {
     }
     return ans;
 }
+```
+
+
+
+
+
+## 数学
+
+#### 数字序列中的某一位数字 Jz.44
+
+**问题**：数字以 0123456789101112131415... 的格式作为一个字符序列，在这个序列中第 2 位（**从下标 0 开始计算**）是 2 ，第 10 位是 1 ，第 13 位是 1 ，以此类推，请输出第 n 位对应的数字
+
+**思路**：
+
+- 先找到第 n 位所在的数，通过减去每次十进制之前的所有数来靠近范围，然后用除去位数来确定
+- 变成 string，用 `(n - 1) % digitCount` 找位数
+
+```c++
+class Solution {
+public:
+    int findNthDigit(int n) {
+        long bottom = 0, top = 9;
+        int digitCount = 1;
+        int num = 0;
+		
+        // 找到第 n 位所在的数
+        while(n > (top - bottom) * digitCount){
+            n -= (top - bottom) * digitCount;
+            bottom = top;
+            top = top * 10 + 9;
+            digitCount += 1;
+        }
+        num = bottom + n/digitCount + (n%digitCount == 0? 0: 1);
+        
+        int index = (n - 1) % digitCount;
+        string s = to_string(num);
+        return s[index] - '0';
+    }
+};
 ```
 
 
