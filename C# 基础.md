@@ -93,7 +93,7 @@ Weather weather = Weather.Cloudy;
 int s;
 switch(weather)
 {
-    case Weather.Sunny: 
+    case Weather.Sunny:
         s = 0;
         break;
     case Weather.cloudy:
