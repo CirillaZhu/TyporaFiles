@@ -85,14 +85,14 @@ c++程序执行时，内存大方向分成不同区域。不同区域存放的�
 
 程序编译后，形成exe可执行程序，**未执行该程序前**，内存分为两个区域
 
-##### **代码区**
+##### **代码区** 
 
 - 由操作系统进行管理
 - 存放函数体二进制代码
 - 共享性，对于频繁执行的程序，有一份代码即可
 - 只读性，防止应用程序意外修改代码
 
-##### **全局区（静态区）**
+##### **全局区（静态区）** 
 
 - 程序结束后由系统释放
 - 存放全局变量，静态变量，常量
@@ -131,7 +131,7 @@ int *p = new int(10);
 delete p;
 
 //创建数组
-int *arr = new int[10];		
+int *arr = new int[10];
 int *arr = new int(10);		//也可以
 arr[0] = 1;
 delete[] arr;
@@ -199,15 +199,13 @@ delete[] arr;
 
 ### 源码，反码，补码
 
-**机器数**：数的二进制表示，第一位为符号位
-
 **真值**：带符号位的机器数对应的真正数值
 
-**源码**：即机器数
+**源码**：即机器数，数的二进制表示，第一位为符号位
 
 **反码**：正数不变；负数符号位不变，其余取反
 
-**补码**：正数不变；负数符号位不变，其余取反，再加一
+**补码**：正数不变；负数为反码加一
 
 | 真值 | 源码      | 反码      | 补码      |
 | ---- | --------- | --------- | --------- |
@@ -264,12 +262,12 @@ int fun(int a, int b);
 #### 占位参数
 
 ```c++
-void fun(int a, int){ 
+void fun(int a, int){
     return a;
 }
 //调用：fun(10, 10),必须有两个参数
 
-void fun(int a, int = 10){ 
+void fun(int a, int = 10){
     return a;
 }
 //调用：fun(10)即可
@@ -279,7 +277,7 @@ void fun(int a, int = 10){
 
 ### 2. 函数重载
 
-**作用**：函数名可以相同，提高复用性
+**作用**：函数名相同，提高复用性
 
 **条件**：
 
@@ -924,7 +922,7 @@ int main(){
 
 #### 基本概念
 
-**重载的运算符**
+**重载的运算符** 
 
 - 是具有特殊名字函数
 - 函数名由 operater 和要定义的运算符组成 
@@ -1216,7 +1214,7 @@ string& Class::operator[](int index){
 
 #### 5.7 () 仿函数
 
-- 类重载了函数调用运算符，可以像使用函数一样使用该类的对象
+- 类重载（），可以像使用函数一样使用该类的对象
 - 称为仿函数，或函数对象
 
 ```c++
@@ -2137,20 +2135,6 @@ v.reserve(int len);			预留 len 个元素长度，不初始化，元素不可�
 
 
 
-#### deque
-
-- deque访问内部元素比 vector 慢
-
-**内部工作原理**
-
-- deque内部有一个**中控器**，数个**缓冲区**
-- 中控器维护每段缓冲区中的地址，缓冲区中存放真实数据
-- 中控器储存每个缓冲区的地址，使得使用deque时像一片连续的内存空间
-
-
-
-
-
 #### stack
 
 - 先进后出 (First In Last Out, FILO) 的数据结构，只有一个出口
@@ -2175,6 +2159,8 @@ c.swap();
 - push() 函数插入函数参数的副本
 - emplace() 函数构造一个新元素作为参数的值，然后将其添加到容器的顶部
 
+
+
 #### queue
 
 - 先进先出 (First In First Out, FIFO) 的数据结构，有两个出口
@@ -2195,6 +2181,60 @@ c.emplace();
 c.empty();
 c.size();
 c.swap();
+```
+
+
+
+#### deque
+
+- deque访问内部元素比 vector 慢
+
+**内部工作原理**
+
+- deque内部有一个**中控器**，数个**缓冲区**
+- 中控器维护每段缓冲区中的地址，缓冲区中存放真实数据
+- 中控器储存每个缓冲区的地址，使得使用deque时像一片连续的内存空间
+
+```c++
+deque<int> d;
+deque<int> d2(v1.begin(), v1.end());
+deque<int> d3(5, 100);
+deque<int> d4(v3);
+
+d.front();
+d.back();
+
+d.push_front(5);
+d.push_back(10);
+d.pop_front();
+d.pop_back();
+
+d.insert(d.begin(), 100);
+d.insert(d.begin(), 5, 100);  //插入5个100
+d.insert(d1.begin(), d2.begin(), d2.end());
+
+v1.erase(v1.begin());
+v1.erase(v1.begin() + 1, v1.end());
+v1.clear();
+```
+
+
+
+#### **priority_queue** 
+
+- 本质是堆
+- less 与 greater 是仿函数
+
+```c++
+priority_queue<int> p;
+priority_queue<int, vector<int>, less<int>> p;  //同上，为大根堆，top 为最大值
+priority_queue<int, vector<int>, greater<int>> p;	//top 为最小值
+
+q.push(3);
+q.top();
+q.pop();
+q.empty();
+q.size();
 ```
 
 
@@ -2938,13 +2978,29 @@ while(cin >> word){
 - lower_bound 和 upper_bound不适用于无序容器
 - 下标和 at 操作只适用于非const
 
-| 函数              | 返回值                                     | 查找失败返回值       |
-| ----------------- | ------------------------------------------ | -------------------- |
-| c.find (k)        | 迭代器，指向第一个关键字为k的元素          | c.end ()             |
-| c.count (k)       | 关键字个数                                 | 0                    |
-| c.lower_bound (k) | 迭代器，指向第一个关键字不小于 k 的元素    |                      |
-| c.upper_bound (k) | 迭代器，指向第一个关键字大于 k 的元素      |                      |
-| c.equal_range (k) | 迭代器 pair，包含关键字等于 k 的元素的范围 | {c.end (), c.end ()} |
+| 函数              | 返回值                                        | 查找失败返回值       |
+| ----------------- | --------------------------------------------- | -------------------- |
+| c.find (k)        | 迭代器，指向第一个关键字为k的元素             | c.end ()             |
+| c.count (k)       | 关键字个数                                    | 0                    |
+| c.lower_bound (k) | 迭代器，指向第一个关键字**大于等于** k 的元素 | c.end ()             |
+| c.upper_bound (k) | 迭代器，指向第一个关键字**大于** k 的元素     | c.end ()             |
+| c.equal_range (k) | 迭代器 pair，包含关键字等于 k 的元素的范围    | {c.end (), c.end ()} |
+
+
+
+- multimap的范围查找
+
+```c++
+unordered_multimap umap; 
+sumMap.insert(make_pair("apple", 10)); 
+sumMap.insert(make_pair("apple", 5)); 
+
+auto range = sumMap.equal_range ("apple");
+for(auto iter = range.first; iter != range.second; ++iter){
+    if(iter -> second == 5)
+        ++count;
+}
+```
 
 
 
