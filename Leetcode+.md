@@ -1,4 +1,4 @@
-最短路径数量
+最短路径数
 
 ```c++
 #include <iostream>
@@ -234,7 +234,7 @@ public:
 
 **思路**：单调栈
 
-1. 暴力一个个找，两层循环，最差 $O(n^2)$
+1. 暴力一个个找，两层循环，最差 $O(n^2)$ 
 2. 栈
    - 遍历 temperature 数组，在当前温度低于栈顶日期温度时，入栈当前日期
    - 当前日期温度高于栈顶日期温度时，栈顶日期出栈，答案记录温差
@@ -264,7 +264,7 @@ public:
 
 
 
-#### 下一个更大元素 I  [No.496](https://leetcode.cn/problems/next-greater-element-i/)
+#### 下一个更大元素 I  [No.496](https://leetcode.cn/problems/next-greater-element-i/) 
 
 ⭐⭐
 
@@ -295,7 +295,7 @@ Explanation: The next greater element for each value of nums1 is as follows:
 
 
 
-力扣你能不能说人话！！看懂之后十分钟写完，看懂之前emo 一小时，我真的会谢。
+力扣你能不能说人话！！看懂之后十分钟写完，看懂之前 emo 一小时，我真的会谢。
 
 **思路**：单调栈
 
@@ -427,7 +427,7 @@ public:
 
 
 
-#### 柱状图中最大的矩形 No. [84](https://leetcode.cn/problems/largest-rectangle-in-histogram/)
+#### 柱状图中最大的矩形 No. [84](https://leetcode.cn/problems/largest-rectangle-in-histogram/) 
 
 ⭐⭐⭐
 
@@ -481,13 +481,36 @@ public:
 
 
 
+#### [莉莉丝真题](https://leetcode.cn/circle/discuss/ZiXY4a/) 
 
+小红买股票，假设第 i 天买入，当能盈利时马上卖出。需要统计在买入到卖出这段区间的股票价格最小值(如无法卖出，则记录买入的价格)。
+假设小红在每天都买入股票的话，那么每天对应的最小值是多少。
+
+举例：
+
+```
+nums={4,2,3,5,1}
+ans={2,2,3,5,1}
+说明：
+第1天买入，第4天卖出，该区间最小值为2。
+第2天买入，第3天卖出，该区间最小值为2。
+第3天买入，第4天卖出，该区间最小值为3。
+第4天买入，卖不出去，记录当天价格为5。
+第5天买入，卖不出去，记录当天价格为1。
+```
+
+
+
+**思路**
+
+- 栈中从前向后存储当前位置于对应最小值，每次入栈时最小值初始化为当前价格
+- 当前方元素弹出后，栈顶元素更新之前栈顶的最小值。
 
 
 
 ### 双端队列
 
-#### * 滑动窗口最大值 No. [239](https://leetcode.cn/problems/sliding-window-maximum/)
+#### * 滑动窗口最大值 No. [239](https://leetcode.cn/problems/sliding-window-maximum/) 
 
 ⭐⭐⭐
 
