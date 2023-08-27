@@ -1,4 +1,4 @@
-最短路径数量
+最短路径数
 
 
 
@@ -282,7 +282,7 @@ public:
 
 **思路**：单调栈
 
-1. 暴力一个个找，两层循环，最差 $O(n^2)$
+1. 暴力一个个找，两层循环，最差 $O(n^2)$ 
 2. 栈
    - 遍历 temperature 数组，在当前温度低于栈顶日期温度时，入栈当前日期
    - 当前日期温度高于栈顶日期温度时，栈顶日期出栈，答案记录温差
@@ -312,7 +312,7 @@ public:
 
 
 
-#### 下一个更大元素 I  [No.496](https://leetcode.cn/problems/next-greater-element-i/)
+#### 下一个更大元素 I  [No.496](https://leetcode.cn/problems/next-greater-element-i/) 
 
 ⭐⭐
 
@@ -343,7 +343,7 @@ Explanation: The next greater element for each value of nums1 is as follows:
 
 
 
-力扣你能不能说人话！！看懂之后十分钟写完，看懂之前emo 一小时，我真的会谢。
+力扣你能不能说人话！！看懂之后十分钟写完，看懂之前 emo 一小时，我真的会谢。
 
 **思路**：单调栈
 
@@ -475,7 +475,7 @@ public:
 
 
 
-#### 柱状图中最大的矩形 No. [84](https://leetcode.cn/problems/largest-rectangle-in-histogram/)
+#### 柱状图中最大的矩形 No. [84](https://leetcode.cn/problems/largest-rectangle-in-histogram/) 
 
 ⭐⭐⭐
 
@@ -529,13 +529,36 @@ public:
 
 
 
+#### [莉莉丝真题](https://leetcode.cn/circle/discuss/ZiXY4a/) 
 
+小红买股票，假设第 i 天买入，当能盈利时马上卖出。需要统计在买入到卖出这段区间的股票价格最小值(如无法卖出，则记录买入的价格)。
+假设小红在每天都买入股票的话，那么每天对应的最小值是多少。
+
+举例：
+
+```
+nums={4,2,3,5,1}
+ans={2,2,3,5,1}
+说明：
+第1天买入，第4天卖出，该区间最小值为2。
+第2天买入，第3天卖出，该区间最小值为2。
+第3天买入，第4天卖出，该区间最小值为3。
+第4天买入，卖不出去，记录当天价格为5。
+第5天买入，卖不出去，记录当天价格为1。
+```
+
+
+
+**思路**
+
+- 栈中从前向后存储当前位置于对应最小值，每次入栈时最小值初始化为当前价格
+- 当前方元素弹出后，栈顶元素更新之前栈顶的最小值。
 
 
 
 ### 双端队列
 
-#### * 滑动窗口最大值 No. [239](https://leetcode.cn/problems/sliding-window-maximum/)
+#### * 滑动窗口最大值 No. [239](https://leetcode.cn/problems/sliding-window-maximum/) 
 
 ⭐⭐⭐
 
@@ -1252,6 +1275,258 @@ public:
 
 
 
+
+## 哈希表
+
+- 查询时间复杂度 O(1)
+- 其实一般就是 unordered_map 啦
+
+
+
+#### 记录字母出现次数 ⭐
+
+- 例中字母全为小写
+
+```c++
+string s = "apple";
+vector<int> table(26, 0);
+
+for(char c : s)
+    ++table['z' - c];
+```
+
+
+
+#### 复杂链表的复制 Jz.35
+
+⭐⭐
+
+**思路**:seedling: ：
+
+```c++
+class Solution {
+public:
+    RandomListNode* Clone(RandomListNode* pHead) {
+        if(!pHead) return pHead;    // 为空则直接返回空
+        unordered_map<RandomListNode*, RandomListNode*> mp;    // 创建哈希表
+ 
+        RandomListNode* dummy = new RandomListNode(0);    // 哨兵节点
+ 
+        RandomListNode *pre = dummy, *cur = pHead;    // 指向哨兵和链表头的指针
+ 
+        while(cur){
+            RandomListNode* clone = new RandomListNode(cur->label);    // 拷贝节点
+            pre->next = clone;    // 与上个结点连接
+            mp[cur] = clone;    // 记录映射关系
+            pre = pre->next;    // 指针移动
+            cur = cur->next;
+        }
+ 
+        for(auto& [key, value] : mp){    // 遍历哈希表
+            value->random = key->random == NULL ? NULL : mp[key->random];
+        }
+ 
+        delete dummy;    // 释放哨兵节点空间
+        return mp[pHead];
+    }
+};
+```
+
+
+
+#### 同构字符串 No.205
+
+⭐
+
+**问题**：
+
+给定两个字符串 `s` 和 `t` ，判断它们是否是同构的。
+
+如果 `s` 中的字符可以按某种映射关系替换得到 `t` ，那么这两个字符串是同构的。
+
+**思路**：
+
+- 两个哈希表，互相映射
+- count 的用法很巧妙，count 为 0，不存在，并且可以作为 false 的判断条件
+
+```c++
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+        unordered_map<char, char> s2t;
+        unordered_map<char, char> t2s;
+        int len = s.length();
+        for (int i = 0; i < len; ++i) {
+            char x = s[i], y = t[i];
+            if ((s2t.count(x) && s2t[x] != y) || (t2s.count(y) && t2s[y] != x)) {
+                return false;
+            }
+            s2t[x] = y;
+            t2s[y] = x;
+        }
+        return true;
+    }
+};
+
+```
+
+
+
+#### 字母异位词分组 No.49
+
+⭐⭐
+
+**问题**：给你一个字符串数组，请你将 **字母异位词** 组合在一起。可以按任意顺序返回结果列表。
+
+​	   **字母异位词** 是由重新排列源单词的所有字母得到的一个新单词。
+
+**示例**:
+
+```输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
+```
+
+**思路**：排序过的字符串做 key，未排序的用 value 收集起来。
+
+```cpp
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        map<string, vector<string>> dic = {};
+        for(string str : strs){
+            string key = str;
+            sort(key.begin(), key.end());
+            dic[key].emplace_back(str);				//不用手动初始化每个vector
+        }
+
+        vector<vector<string>> ans;
+        for(auto iter = dic.begin(); iter != dic.end(); ++iter){
+            ans.emplace_back(iter -> second);
+        }
+
+        return ans;
+    }
+};
+```
+
+
+
+#### 最长连续序列 No.128
+
+⭐⭐
+
+**问题**：
+
+- 给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+- 请你设计并实现时间复杂度为 O(n) 的算法解决此问题。
+
+**思路**：
+
+- 先放入 set 中去重
+- 遍历set，对每个数 x
+  - x - 1 不存在于 set 中，x 为序列开头，查看此序列的长度
+  - x - 1 存在于 set 中，跳过
+
+**优化点**：
+
+- 使用 set 而非 map
+- 使用 **unordered_set** 而非 set，进一步优化插入与查找时间。unordered_set 底层为哈希表，插入与查找时间需要O(1)，set 底层为红黑树，插入与查找时间需要O(logN)
+- 遍历时无需迭代器，直接 `for(int num : hashSet)`。事实上，与迭代器时间复杂度一致，只是写法简化
+- 遍历时，`const int&` 减少复制，进一步优化时间
+
+```c++
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        if(nums.empty())
+            return 0;
+
+        unordered_set<int> hashSet; 
+        for(const int& num : nums){
+            hashSet.insert(num);
+        }
+
+        int ans = 1;
+        int count = 1;
+        for(const int& num : hashSet){
+            if(hashSet.find(num - 1) != hashSet.end()){
+                continue;
+            }
+            else{
+                int i = num;
+                while(hashSet.find(++i) != hashSet.end()){
+                    ++count;
+                }
+                ans = max(count, ans);
+                count = 1;
+            }
+
+        }
+
+        return ans;
+    }
+};
+
+```
+
+
+
+#### 和为 K 的子数组 No.[560](https://leetcode.cn/problems/subarray-sum-equals-k/)
+
+⭐⭐
+
+给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的连续子数组的个数 。
+
+**示例**：
+
+输入：nums = [1,1,1], k = 2
+输出：2
+
+**思路**：
+
+- 前缀和！和哈希表是绝佳搭配
+- 用哈希表来记录累加和的**出现次数** 
+- 遍历数组，依次计算当前位置的累加和，并在哈希表中查找之前的累加和与当前累加和之差是否等于k
+- 一边计算，一边查找当前位置之前的，可以避免重复计算
+
+
+
+```c++
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        unordered_map<int, int> sumNum;	  // 使用哈希表记录累加和的出现次数
+        sumNum[0] = 1;	//处理特殊情况，当前位置累加和刚好等于 k
+        int curSum = 0;
+        int count = 0;
+
+        for(int i = 0; i < nums.size(); ++i){
+            curSum = nums[i] + curSum; // 计算当前位置的累加和
+
+            // 如果之前的累加和与当前累加和之差等于k
+            if(sumNum.find(curSum - k) != sumNum.end()){
+                count += sumNum[curSum - k];
+            }
+
+            // 更新累加和curSum在哈希表中的出现次数
+            if(sumNum.find(curSum) != sumNum.end()){
+                sumNum[curSum]++;
+            }
+            else{
+                sumNum[curSum] = 1;
+            }
+        }
+
+        return count;
+    }
+};
+
+```
+
+
+
+前缀和其他练习：[437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/)
 
 
 
@@ -3527,6 +3802,8 @@ public:
 
 
 
+# 图论
+
 ## BFS
 
 - 用循环处理即可
@@ -3722,6 +3999,208 @@ public:
 
 
 
+## 拓扑排序
+
+- 求出一种拓扑排序方法的最优时间复杂度为 O(n+m)
+- 解决有向无环图（DAG）中节点的线性排序问题
+
+
+
+##### 邻接表
+
+- 图的常用储存结构，比邻接矩阵节约空间，用两层 vector 嵌套实现
+- 即为链表的嵌套，每列第一个代表当前节点，后面连接当前节点的度
+- 带权重的图也可以用
+
+
+
+<img src="Typora Pictures/Leetcode+.assets/image-20230630013122602.png" alt="image-20230630013122602" style="zoom:33%;" />
+
+
+
+#### 课程表 II No.[210](https://leetcode.cn/problems/course-schedule-ii/) 
+
+⭐⭐
+
+**问题**：现在你总共有 numCourses 门课需要选，记为 0 到 numCourses - 1。给你一个数组 prerequisites ，其中 prerequisites[i] = [ai, bi] ，表示在选修课程 ai 前 必须 先选修 bi 。
+
+```
+例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示：[0,1] 。
+```
+
+返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 **任意一种** 就可以了。如果不可能完成所有课程，返回 一个空数组 。
+
+**思路**：
+
+1. **构建图模型：** 将课程和其先决条件之间的关系表示为一个有向图。图中的节点表示课程，边表示课程之间的依赖关系。我们可以使用邻接表或邻接矩阵来表示图。
+2. **计算入度：** 对于每个节点（课程），计算其入度，即指向该节点的边的数量。入度表示了有多少先决条件需要满足才能学习该课程。
+3. **拓扑排序：** 使用拓扑排序算法来检测是否存在合法的课程表安排。拓扑排序是一种对有向无环图（DAG）进行排序的算法，它保证了节点的先决条件在排序中排在前面。
+   - 创建一个队列来存储入度为0的节点（没有先决条件的课程）。
+   - 将所有入度为0的节点入队。
+   - 从队列中依次取出节点，更新与该节点相邻的节点的入度。如果更新后的入度为0，则将该节点入队（或入栈）。
+   - 重复上述步骤，直到队列为空。
+4. **检查结果：** 在拓扑排序结束后，如果存在环路（即图中存在循环依赖），则无法安排课程，返回 false。否则，所有课程都能按照拓扑排序的顺序学习，返回 true。
+
+```c++
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<int> finished;
+        vector<int> numFrontCourse(numCourses, 0);
+        vector<vector<int>> afterCourse(numCourses);
+
+        // 初始化所有课程的度数和后续课程列表
+        for(const vector<int>& prerequisite : prerequisites){
+            ++numFrontCourse[prerequisite[0]]; // 前置课程的度数加一
+            afterCourse[prerequisite[1]].push_back(prerequisite[0]); // 将前置课程添加到后续课程列表中
+        }
+
+        queue<int> learningCourse; // 用队列存储当前可学习的课程
+
+        // 将度数为 0 的课程放入队列中
+        for(int i = 0; i < numCourses; ++i){
+            if(numFrontCourse[i] == 0){
+                learningCourse.push(i);
+            }
+        }
+
+        while(!learningCourse.empty()){
+            int cur = learningCourse.front();
+            learningCourse.pop();
+
+            finished.push_back(cur); // 将学习完的课程添加到结果中
+
+            // 遍历当前课程的后续课程列表
+            for(int c : afterCourse[cur]){
+                if(--numFrontCourse[c] == 0){
+                    learningCourse.push(c); // 将度数变为 0 的课程放入队列
+                }
+            }
+        }
+
+        if(finished.size() != numCourses){
+            return {}; // 无法完成所有课程学习，返回空数组
+        }
+
+        return finished;
+    }
+};
+```
+
+
+
+## 并查集
+
+
+
+判断根：`root[i] == i`
+
+```c++
+class Solution {
+public:
+    int findHead(int a, vector<int>& leader){
+        while(leader[a] != a){
+            a = leader[a];
+        }
+
+        return a;
+    }
+
+    void union(int a, int b, vector<int>& leader){
+        leader[findHead(b, leader)] = findHead(a, leader);
+    }
+
+    bool test(int a, int b, vector<int>& leader){
+        return findHead(a, leader) == findHead(b, leader);
+    }
+    
+    //题目主函数中初始化
+    int result(){
+    	int n;
+    	vector<int> leader(n);
+
+        for(int i = 0; i < n; ++i){
+            leader[i] = i;
+        }
+    }
+
+};
+```
+
+
+
+- 统计不同并查集的数量，看  `leader[i] == i`  的数量即可
+
+
+
+# 数学
+
+#### 矩形面积 No.223
+
+给你 **二维** 平面上两个 **由直线构成且边与坐标轴平行/垂直** 的矩形，请你计算并返回两个矩形覆盖的总面积。
+
+每个矩形由其 **左下** 顶点和 **右上** 顶点坐标表示：
+
+- 第一个矩形由其左下顶点 `(ax1, ay1)` 和右上顶点 `(ax2, ay2)` 定义。
+- 第二个矩形由其左下顶点 `(bx1, by1)` 和右上顶点 `(bx2, by2)` 定义。
+
+![image-20230809024027402](Typora Pictures/Leetcode+.assets/image-20230809024027402.png)
+
+
+
+**思路**：
+
+- 用两个矩形的面积减去中间重叠的部分
+
+```c++
+class Solution {
+public:
+    int computeArea(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2) {
+        int overlapSize = max(min(ax2, bx2) - max(ax1, bx1), 0) * max(min(ay2, by2) - max(ay1, by1), 0);
+        return (ax2 - ax1)*(ay2 - ay1) + (bx2 - bx1)*(by2 - by1) - overlapSize;
+    }
+};
+```
+
+
+
+#### 数字序列中的某一位数字 Jz.44
+
+**问题**：数字以 0123456789101112131415... 的格式作为一个字符序列，在这个序列中第 2 位（**从下标 0 开始计算**）是 2 ，第 10 位是 1 ，第 13 位是 1 ，以此类推，请输出第 n 位对应的数字
+
+**思路**：
+
+- 先找到第 n 位所在的数，通过减去每次十进制之前的所有数来靠近范围，然后用除去位数来确定
+- 变成 string，用 `(n - 1) % digitCount` 找位数
+
+```c++
+class Solution {
+public:
+    int findNthDigit(int n) {
+        long bottom = 0, top = 9;
+        int digitCount = 1;
+        int num = 0;
+		
+        // 找到第 n 位所在的数
+        while(n > (top - bottom) * digitCount){
+            n -= (top - bottom) * digitCount;
+            bottom = top;
+            top = top * 10 + 9;
+            digitCount += 1;
+        }
+        num = bottom + n/digitCount + (n%digitCount == 0? 0: 1);
+        
+        int index = (n - 1) % digitCount;
+        string s = to_string(num);
+        return s[index] - '0';
+    }
+};
+```
+
+
+
+
+
 ### 循环不变量
 
 #### 颜色分类 No.75
@@ -3775,258 +4254,6 @@ public:
 - 找出最靠右顺序对后，反转后面的所有数字
 
 
-
-## 哈希表
-
-- 查询时间复杂度 O(1)
-- 其实一般就是 unordered_map 啦
-
-
-
-#### 记录字母出现次数 ⭐
-
-- 例中字母全为小写
-
-```c++
-string s = "apple";
-vector<int> table(26, 0);
-
-for(char c : s)
-    ++table['z' - c];
-```
-
-
-
-#### 复杂链表的复制 Jz.35
-
-⭐⭐
-
-**思路**:seedling: ：
-
-```c++
-class Solution {
-public:
-    RandomListNode* Clone(RandomListNode* pHead) {
-        if(!pHead) return pHead;    // 为空则直接返回空
-        unordered_map<RandomListNode*, RandomListNode*> mp;    // 创建哈希表
- 
-        RandomListNode* dummy = new RandomListNode(0);    // 哨兵节点
- 
-        RandomListNode *pre = dummy, *cur = pHead;    // 指向哨兵和链表头的指针
- 
-        while(cur){
-            RandomListNode* clone = new RandomListNode(cur->label);    // 拷贝节点
-            pre->next = clone;    // 与上个结点连接
-            mp[cur] = clone;    // 记录映射关系
-            pre = pre->next;    // 指针移动
-            cur = cur->next;
-        }
- 
-        for(auto& [key, value] : mp){    // 遍历哈希表
-            value->random = key->random == NULL ? NULL : mp[key->random];
-        }
- 
-        delete dummy;    // 释放哨兵节点空间
-        return mp[pHead];
-    }
-};
-```
-
-
-
-#### 同构字符串 No.205
-
-⭐
-
-**问题**：
-
-给定两个字符串 `s` 和 `t` ，判断它们是否是同构的。
-
-如果 `s` 中的字符可以按某种映射关系替换得到 `t` ，那么这两个字符串是同构的。
-
-**思路**：
-
-- 两个哈希表，互相映射
-- count 的用法很巧妙，count 为 0，不存在，并且可以作为 false 的判断条件
-
-```c++
-class Solution {
-public:
-    bool isIsomorphic(string s, string t) {
-        unordered_map<char, char> s2t;
-        unordered_map<char, char> t2s;
-        int len = s.length();
-        for (int i = 0; i < len; ++i) {
-            char x = s[i], y = t[i];
-            if ((s2t.count(x) && s2t[x] != y) || (t2s.count(y) && t2s[y] != x)) {
-                return false;
-            }
-            s2t[x] = y;
-            t2s[y] = x;
-        }
-        return true;
-    }
-};
-
-```
-
-
-
-#### 字母异位词分组 No.49
-
-⭐⭐
-
-**问题**：给你一个字符串数组，请你将 **字母异位词** 组合在一起。可以按任意顺序返回结果列表。
-
-​	   **字母异位词** 是由重新排列源单词的所有字母得到的一个新单词。
-
-**示例**:
-
-```输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
-输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
-输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
-```
-
-**思路**：排序过的字符串做 key，未排序的用 value 收集起来。
-
-```cpp
-class Solution {
-public:
-    vector<vector<string>> groupAnagrams(vector<string>& strs) {
-        map<string, vector<string>> dic = {};
-        for(string str : strs){
-            string key = str;
-            sort(key.begin(), key.end());
-            dic[key].emplace_back(str);				//不用手动初始化每个vector
-        }
-
-        vector<vector<string>> ans;
-        for(auto iter = dic.begin(); iter != dic.end(); ++iter){
-            ans.emplace_back(iter -> second);
-        }
-
-        return ans;
-    }
-};
-```
-
-
-
-#### 最长连续序列 No.128
-
-⭐⭐
-
-**问题**：
-
-- 给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
-- 请你设计并实现时间复杂度为 O(n) 的算法解决此问题。
-
-**思路**：
-
-- 先放入 set 中去重
-- 遍历set，对每个数 x
-  - x - 1 不存在于 set 中，x 为序列开头，查看此序列的长度
-  - x - 1 存在于 set 中，跳过
-
-**优化点**：
-
-- 使用 set 而非 map
-- 使用 **unordered_set** 而非 set，进一步优化插入与查找时间。unordered_set 底层为哈希表，插入与查找时间需要O(1)，set 底层为红黑树，插入与查找时间需要O(logN)
-- 遍历时无需迭代器，直接 `for(int num : hashSet)`。事实上，与迭代器时间复杂度一致，只是写法简化
-- 遍历时，`const int&` 减少复制，进一步优化时间
-
-```c++
-class Solution {
-public:
-    int longestConsecutive(vector<int>& nums) {
-        if(nums.empty())
-            return 0;
-
-        unordered_set<int> hashSet; 
-        for(const int& num : nums){
-            hashSet.insert(num);
-        }
-
-        int ans = 1;
-        int count = 1;
-        for(const int& num : hashSet){
-            if(hashSet.find(num - 1) != hashSet.end()){
-                continue;
-            }
-            else{
-                int i = num;
-                while(hashSet.find(++i) != hashSet.end()){
-                    ++count;
-                }
-                ans = max(count, ans);
-                count = 1;
-            }
-
-        }
-
-        return ans;
-    }
-};
-
-```
-
-
-
-#### 和为 K 的子数组 No.[560](https://leetcode.cn/problems/subarray-sum-equals-k/)
-
-⭐⭐
-
-给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的连续子数组的个数 。
-
-**示例**：
-
-输入：nums = [1,1,1], k = 2
-输出：2
-
-**思路**：
-
-- 前缀和！和哈希表是绝佳搭配
-- 用哈希表来记录累加和的**出现次数** 
-- 遍历数组，依次计算当前位置的累加和，并在哈希表中查找之前的累加和与当前累加和之差是否等于k
-- 一边计算，一边查找当前位置之前的，可以避免重复计算
-
-
-
-```c++
-class Solution {
-public:
-    int subarraySum(vector<int>& nums, int k) {
-        unordered_map<int, int> sumNum;	  // 使用哈希表记录累加和的出现次数
-        sumNum[0] = 1;	//处理特殊情况，当前位置累加和刚好等于 k
-        int curSum = 0;
-        int count = 0;
-
-        for(int i = 0; i < nums.size(); ++i){
-            curSum = nums[i] + curSum; // 计算当前位置的累加和
-
-            // 如果之前的累加和与当前累加和之差等于k
-            if(sumNum.find(curSum - k) != sumNum.end()){
-                count += sumNum[curSum - k];
-            }
-
-            // 更新累加和curSum在哈希表中的出现次数
-            if(sumNum.find(curSum) != sumNum.end()){
-                sumNum[curSum]++;
-            }
-            else{
-                sumNum[curSum] = 1;
-            }
-        }
-
-        return count;
-    }
-};
-
-```
-
-
-
-前缀和其他练习：[437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/)
 
 
 
@@ -4142,168 +4369,6 @@ int superPow(int a, vector<int>& b) {
 ```
 
 
-
-
-
-## 数学
-
-#### 矩形面积 No.223
-
-给你 **二维** 平面上两个 **由直线构成且边与坐标轴平行/垂直** 的矩形，请你计算并返回两个矩形覆盖的总面积。
-
-每个矩形由其 **左下** 顶点和 **右上** 顶点坐标表示：
-
-- 第一个矩形由其左下顶点 `(ax1, ay1)` 和右上顶点 `(ax2, ay2)` 定义。
-- 第二个矩形由其左下顶点 `(bx1, by1)` 和右上顶点 `(bx2, by2)` 定义。
-
-![image-20230809024027402](Typora Pictures/Leetcode+.assets/image-20230809024027402.png)
-
-
-
-**思路**：
-
-- 用两个矩形的面积减去中间重叠的部分
-
-```c++
-class Solution {
-public:
-    int computeArea(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2) {
-        int overlapSize = max(min(ax2, bx2) - max(ax1, bx1), 0) * max(min(ay2, by2) - max(ay1, by1), 0);
-        return (ax2 - ax1)*(ay2 - ay1) + (bx2 - bx1)*(by2 - by1) - overlapSize;
-    }
-};
-```
-
-
-
-#### 数字序列中的某一位数字 Jz.44
-
-**问题**：数字以 0123456789101112131415... 的格式作为一个字符序列，在这个序列中第 2 位（**从下标 0 开始计算**）是 2 ，第 10 位是 1 ，第 13 位是 1 ，以此类推，请输出第 n 位对应的数字
-
-**思路**：
-
-- 先找到第 n 位所在的数，通过减去每次十进制之前的所有数来靠近范围，然后用除去位数来确定
-- 变成 string，用 `(n - 1) % digitCount` 找位数
-
-```c++
-class Solution {
-public:
-    int findNthDigit(int n) {
-        long bottom = 0, top = 9;
-        int digitCount = 1;
-        int num = 0;
-		
-        // 找到第 n 位所在的数
-        while(n > (top - bottom) * digitCount){
-            n -= (top - bottom) * digitCount;
-            bottom = top;
-            top = top * 10 + 9;
-            digitCount += 1;
-        }
-        num = bottom + n/digitCount + (n%digitCount == 0? 0: 1);
-        
-        int index = (n - 1) % digitCount;
-        string s = to_string(num);
-        return s[index] - '0';
-    }
-};
-```
-
-
-
-
-
-# 图
-
-
-
-##### 邻接表
-
-- 图的常用储存结构，比邻接矩阵节约空间，用两层 vector 嵌套实现
-- 即为链表的嵌套，每列第一个代表当前节点，后面连接当前节点的度
-- 带权重的图也可以用
-
-
-
-<img src="Typora Pictures/Leetcode+.assets/image-20230630013122602.png" alt="image-20230630013122602" style="zoom:33%;" />
-
-
-
-## 拓扑排序
-
-- 求出一种拓扑排序方法的最优时间复杂度为 O(n+m)
-- 解决有向无环图（DAG）中节点的线性排序问题
-
-
-
-#### 课程表 II No.[210](https://leetcode.cn/problems/course-schedule-ii/) 
-
-⭐⭐
-
-**问题**：现在你总共有 numCourses 门课需要选，记为 0 到 numCourses - 1。给你一个数组 prerequisites ，其中 prerequisites[i] = [ai, bi] ，表示在选修课程 ai 前 必须 先选修 bi 。
-
-```
-例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示：[0,1] 。
-```
-
-返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 **任意一种** 就可以了。如果不可能完成所有课程，返回 一个空数组 。
-
-**思路**：
-
-1. **构建图模型：** 将课程和其先决条件之间的关系表示为一个有向图。图中的节点表示课程，边表示课程之间的依赖关系。我们可以使用邻接表或邻接矩阵来表示图。
-2. **计算入度：** 对于每个节点（课程），计算其入度，即指向该节点的边的数量。入度表示了有多少先决条件需要满足才能学习该课程。
-3. **拓扑排序：** 使用拓扑排序算法来检测是否存在合法的课程表安排。拓扑排序是一种对有向无环图（DAG）进行排序的算法，它保证了节点的先决条件在排序中排在前面。
-   - 创建一个队列来存储入度为0的节点（没有先决条件的课程）。
-   - 将所有入度为0的节点入队。
-   - 从队列中依次取出节点，更新与该节点相邻的节点的入度。如果更新后的入度为0，则将该节点入队（或入栈）。
-   - 重复上述步骤，直到队列为空。
-4. **检查结果：** 在拓扑排序结束后，如果存在环路（即图中存在循环依赖），则无法安排课程，返回 false。否则，所有课程都能按照拓扑排序的顺序学习，返回 true。
-
-```c++
-class Solution {
-public:
-    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<int> finished;
-        vector<int> numFrontCourse(numCourses, 0);
-        vector<vector<int>> afterCourse(numCourses);
-
-        // 初始化所有课程的度数和后续课程列表
-        for(const vector<int>& prerequisite : prerequisites){
-            ++numFrontCourse[prerequisite[0]]; // 前置课程的度数加一
-            afterCourse[prerequisite[1]].push_back(prerequisite[0]); // 将前置课程添加到后续课程列表中
-        }
-
-        queue<int> learningCourse; // 用队列存储当前可学习的课程
-
-        // 将度数为 0 的课程放入队列中
-        for(int i = 0; i < numCourses; ++i){
-            if(numFrontCourse[i] == 0){
-                learningCourse.push(i);
-            }
-        }
-
-        while(!learningCourse.empty()){
-            int cur = learningCourse.front();
-            learningCourse.pop();
-
-            finished.push_back(cur); // 将学习完的课程添加到结果中
-
-            // 遍历当前课程的后续课程列表
-            for(int c : afterCourse[cur]){
-                if(--numFrontCourse[c] == 0){
-                    learningCourse.push(c); // 将度数变为 0 的课程放入队列
-                }
-            }
-        }
-
-        if(finished.size() != numCourses){
-            return {}; // 无法完成所有课程学习，返回空数组
-        }
-
-        return finished;
-    }
-};
-```
 
 
 
