@@ -1,9 +1,12 @@
 最短路径数
 
+
+
 ```c++
 #include <iostream>
 #include <vector>
 using namespace std;
+
 
 int main()
 {
@@ -27,6 +30,50 @@ int main()
 	return 0;
 }
 ```
+
+
+
+## 并查集
+
+
+
+判断根：`root[i] == i`
+
+```
+class Solution {
+public:
+    int findHead(int a, vector<int>& leader){
+        while(leader[a] != a){
+            a = leader[a];
+        }
+
+        return a;
+    }
+
+    void union(int a, int b, vector<int>& leader){
+        leader[findHead(b, leader)] = findHead(a, leader);
+    }
+
+    bool test(int a, int b, vector<int>& leader){
+        return findHead(a, leader) == findHead(b, leader);
+    }
+    
+    //题目主函数中初始化
+    int result(){
+        int n;
+        vector<int> leader(n);
+
+        for(int i = 0; i < n; ++i){
+            leader[i] = i;
+        }
+    }
+
+};
+```
+
+
+
+- 统计不同并查集的数量，看  `leader[i] == i`  的数量即可
 
 
 
@@ -108,6 +155,7 @@ int main()
 class Solution {
 public:
 //中心扩散法
+    
     string longestPalindrome(string s) {
         if(s.size() < 1)
             return "";
