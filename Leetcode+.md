@@ -35,6 +35,7 @@ int main()
 
 ## 并查集
 
+- 帮派找老大，毒贩找上线
 
 
 判断根：`root[i] == i`
@@ -394,9 +395,9 @@ public:
 **思路 1**：动态规划
 
 - 按列求，每列上方能接的最多雨水，取决于左边最高的柱子与右边最高的柱子低的那个
+- 建立数组，记录每根柱子右侧最高的柱子
 - 从左到右，依次计算每个柱子可以接多少雨水
 - 用指针，实时更新当前柱子左侧最高的柱子
-- 建立数组，记录每根柱子右侧最高的柱子
 
 
 
@@ -595,6 +596,110 @@ ans={2,2,3,5,1}
   - 队列长度等于滑动窗口长度！
   - 如果当前最大值将要离开滑动窗口，队列 pop_front()
   - 如果当前要插入的值大于队尾的数，则 pop_back()，直到当前要插入的值小于队尾的数，然后 push_back()
+
+
+
+#### LRU缓存
+
+请你设计并实现一个满足 [LRU (最近最少使用) 缓存](https://baike.baidu.com/item/LRU) 约束的数据结构。
+
+实现 `LRUCache` 类：
+
+- `LRUCache(int capacity)` 以 **正整数** 作为容量 `capacity` 初始化 LRU 缓存
+- `int get(int key)` 如果关键字 `key` 存在于缓存中，则返回关键字的值，否则返回 `-1` 。
+- `void put(int key, int value)` 如果关键字 `key` 已经存在，则变更其数据值 `value` ；如果不存在，则向缓存中插入该组 `key-value` 。如果插入操作导致关键字数量超过 `capacity` ，则应该 **逐出** 最久未使用的关键字。
+
+函数 `get` 和 `put` 必须以 `O(1)` 的平均时间复杂度运行。
+
+
+
+**思路**
+
+- 重点在于，函数 `get` 和 `put`  `O(1)` 的平均时间复杂度
+
+-  `get` O(1) 只能用Unordered_map，但只用map没办法在 `O(1)`时间复杂度内 **逐出** 最久未使用的关键字
+
+- 因此引入双向链表，每次 put 插入队尾。map 中则储存 key 值对应在链表中的地址
+
+  
+
+```c++
+struct DLinkedNode{
+    int key, value;
+    DLinkedNode *pre, *next;
+    //DLinkedNode(): key(0), value(0), pre(nullptr), next(nullptr){}
+    DLinkedNode(int k = 0, int v = 0){
+        key = k;
+        value = v;
+    }
+};
+
+class LRUCache {
+public:
+    int capacity;
+    unordered_map<int, DLinkedNode*> cache;  //储存 key 的双向链表节点的地址
+    DLinkedNode* head = new DLinkedNode();
+    DLinkedNode* tail = new DLinkedNode();
+
+    LRUCache(int capacity) {
+        this -> capacity = capacity;
+        head -> next = tail;
+        tail -> pre = head;
+    }
+    
+    int get(int key) {
+        if(cache.find(key) != cache.end()){
+            if(cache[key] -> pre != head){
+                remove(cache[key]);
+                insertToHead(cache[key]);
+            }
+            return cache[key] -> value;
+        }
+        else{
+            return -1;
+        }
+    }
+    
+    void put(int key, int value) {
+        if(cache.find(key) == cache.end()){ //没找到
+            if(cache.size() == capacity){
+                cache.erase(tail -> pre -> key);
+                delete remove(tail -> pre);
+            }
+            cache[key] = new DLinkedNode(key, value);
+            insertToHead(cache[key]);
+        }
+        else{ //找到了
+            if(cache[key] -> pre != head){
+                remove(cache[key]);
+                insertToHead(cache[key]);
+            }
+            cache[key] -> value = value;
+        }
+    }
+
+    void insertToHead(DLinkedNode* d){
+         d -> next = head -> next;
+         d -> pre = head;
+         head -> next = d;
+         d -> next -> pre = d;
+    }
+
+    DLinkedNode* remove(DLinkedNode* d){
+        DLinkedNode *preD = d -> pre;
+        preD -> next = d -> next;
+        preD -> next -> pre = preD;
+        return d;
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+```
 
 
 
