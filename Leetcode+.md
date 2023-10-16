@@ -33,6 +33,41 @@ int main()
 
 
 
+## 闭包 / lambda表达式
+
+#### 多重排序
+
+- 按照 **rating** 从高到低排序。如果 **rating** 相同，那么按 **id** 从高到低排序
+- 写法一
+
+```c++
+vector<vector<int>> f;
+sort(f.begin(), f.end(), [](vector<int> &v1, vector<int> &v2){    
+    return v1[1] > v2[1] || (v1[1] == v2[1] && v1[0] > v2[0]);
+});
+```
+
+
+
+- 写法二
+
+```c++
+sort(f.begin(), f.end(), [](vector<int>& a, vector<int>& b) -> bool {
+    if(a[1] == b[1]){
+        if(a[0] < b[0]) return false;
+        else return true;
+    }
+    else if(a[1] < b[1]){
+        return false;
+    }
+    else{
+        return true;
+    }
+});
+```
+
+
+
 ## 并查集
 
 - 帮派找老大，毒贩找上线
@@ -3635,7 +3670,9 @@ public:
 
 
 
-#### [跳跃游戏 II No.45](https://leetcode.cn/problems/jump-game-ii/) ⭐⭐
+#### [跳跃游戏 II No.45](https://leetcode.cn/problems/jump-game-ii/) 
+
+⭐⭐
 
 **问题**
 
@@ -3753,6 +3790,115 @@ public:
         }
 
         return count;
+    }
+};
+```
+
+
+
+#### 避免洪水泛滥 No.[1488](https://leetcode.cn/problems/avoid-flood-in-the-city/) :beers:
+
+关联容器！很有帮助！
+
+⭐⭐
+
+你的国家有无数个湖泊，所有湖泊一开始都是空的。当第 `n` 个湖泊下雨前是空的，那么它就会装满水。如果第 `n` 个湖泊下雨前是 **满的** ，这个湖泊会发生 **洪水** 。你的目标是避免任意一个湖泊发生洪水。
+
+给你一个整数数组 `rains` ，其中：
+
+- `rains[i] > 0` 表示第 `i` 天时，第 `rains[i]` 个湖泊会下雨。
+- `rains[i] == 0` 表示第 `i` 天没有湖泊会下雨，你可以选择 **一个** 湖泊并 **抽干** 这个湖泊的水。
+
+请返回一个数组 `ans` ，满足：
+
+- `ans.length == rains.length`
+- 如果 `rains[i] > 0` ，那么`ans[i] == -1` 。
+- 如果 `rains[i] == 0` ，`ans[i]` 是你第 `i` 天选择抽干的湖泊。
+
+如果有多种可行解，请返回它们中的 **任意一个** 。如果没办法阻止洪水，请返回一个 **空的数组** 。
+
+请注意，如果你选择抽干一个装满水的湖泊，它会变成一个空的湖泊。但如果你选择抽干一个空的湖泊，那么将无事发生。
+
+ 
+
+**示例 1：**
+
+> 输入：rains = [1,2,3,4]
+> 输出：[-1,-1,-1,-1]
+> 解释：第一天后，装满水的湖泊包括 [1]
+> 第二天后，装满水的湖泊包括 [1,2]
+> 第三天后，装满水的湖泊包括 [1,2,3]
+> 第四天后，装满水的湖泊包括 [1,2,3,4]
+> 没有哪一天你可以抽干任何湖泊的水，也没有湖泊会发生洪水。
+
+**示例 2：**
+
+> 输入：rains = [1,2,0,0,2,1]
+> 输出：[-1,-1,2,1,-1,-1]
+> 解释：第一天后，装满水的湖泊包括 [1]
+> 第二天后，装满水的湖泊包括 [1,2]
+> 第三天后，我们抽干湖泊 2 。所以剩下装满水的湖泊包括 [1]
+> 第四天后，我们抽干湖泊 1 。所以暂时没有装满水的湖泊了。
+> 第五天后，装满水的湖泊包括 [2]。
+> 第六天后，装满水的湖泊包括 [1,2]。
+> 可以看出，这个方案下不会有洪水发生。同时， [-1,-1,1,2,-1,-1] 也是另一个可行的没有洪水的方案。
+
+
+
+**思路**：贪心 + 二分查找
+
+- `map<int, int> fullDayOfLake` 存储当前装满水的湖，和装满水的日期
+- `set<int> dryDay` 存储所有可以抽干湖水的日期
+- `vector<int> res` 记录答案，初始化为 1
+- 遍历 rains
+  - 不下雨的天记入 dryDay
+  - 下雨的天去 fullDayOfLake 中找，不管找没找到，都会在今天把湖水重新加满，res 的今天都要记为 -1
+    - 如果找到了，说明现在满了，在 dryDay 找湖水被填满后，最早可以抽水的一天，找不到则水会溢出，找到了从  dryDay 中移除，更新 res
+    - 没找到，说明没满，把湖水加满
+- 二分查找，此处 `lower_bound` 与 `upper_bound`效果在相同，详情见[C++常用概念](C++常用概念.md\#Set)
+- 时间复杂度 O(nlogn)，遍历每个元素 n 并二分查找 logn
+
+
+
+**启发**：
+
+- set 作为了顺序容器使用
+-  `lower_bound` 或 `upper_bound` 是天生的二分查找
+- `.count()` 可以用来表示是否找到，比 `.find()`简洁。需要返回找到的东西本身的时候，还是要用 `.find()`
+- `.erase()` 可以按照 key 删除，也可以按照迭代器删除
+
+```c++
+class Solution {
+public:
+    vector<int> avoidFlood(vector<int>& rains) {
+        vector<int> res(rains.size(), 1);
+        map<int, int> fullDayOfLake;
+        set<int> dryDay;
+
+        for(int i = 0; i < rains.size(); ++i){
+            if(rains[i] == 0){
+                dryDay.insert(i);
+            }
+            else{
+                res[i] = -1;
+            
+                if(fullDayOfLake.count(rains[i])){    //找到了，湖填满过
+                    auto iter = dryDay.lower_bound(fullDayOfLake[rains[i]]);
+                    if(iter == dryDay.end()){
+                        return {};
+                    }
+                    else{
+                        res[*iter] = rains[i];
+                        dryDay.erase(iter);
+                    }
+                }
+
+                fullDayOfLake[rains[i]] = i;
+            }
+            
+        }
+
+        return res;
     }
 };
 ```

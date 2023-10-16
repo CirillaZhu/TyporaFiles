@@ -2598,6 +2598,19 @@ int main(){
 
 
 
+##### 指针访问二维数组
+
+```c++
+int a[3][4], i = 1, j = 1;
+二维数组当一维数组访问：
+*(p + i)
+
+数组指针访问：
+*(*(a + i) + j)
+```
+
+https://blog.csdn.net/rubstone/article/details/103186898
+
 
 
 ## Ⅵ 泛型算法
@@ -3004,7 +3017,7 @@ sumMap.insert(make_pair("apple", 5));
 
 auto range = sumMap.equal_range ("apple");
 for(auto iter = range.first; iter != range.second; ++iter){
-    if(iter -> second == 5)un
+    if(iter -> second == 5)
         ++count;
 }
 ```
@@ -3064,6 +3077,29 @@ int main(){
 ```
 
 
+
+### Set
+
+```c++
+insert()	//插入元素		返回 pair<iterator,bool>
+count()		//判断容器中是否存在某个元素
+size()		//返回容器的尺寸，也可以元素的个数
+erase()		//删除集合中某个元素，可以传值也可以传迭代器
+clear()		//清空集合
+empty()		//判断是否为空
+begin()		//返回第一个节点的迭代器
+end()		//返回最后一个节点加1的迭代器
+rbegin()	//反向迭代器
+rend()		//反向迭代器
+
+//功能函数（进阶）
+find()			//查找某个指定元素的迭代器，没找到则返回 .end()
+lower_bound()	//二分查找，返回第一个大于等于某个值的元素的迭代器
+upper_bound()	//二分查找，返回一个大于某个值的元素的迭代器
+get_allocator()	//返回集合的分配器
+swap()			//交换两个集合的变量
+max_size()		//返回集合能容纳元素的最大限值
+```
 
 
 
